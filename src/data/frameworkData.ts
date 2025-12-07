@@ -576,6 +576,50 @@ For each Subcomponent:
     ],
     source: 'COMPREHENSIVE_EDUCATIONAL_MODEL_PATENT_DRAFT.pdf',
   },
+  integratedAssessment: {
+    title: 'Integrated Assessment',
+    points: [
+      'Multi-method assessment capturing interactions between domains',
+      'Holistic view of individual capabilities and development needs',
+      'Triangulation of psychometric, behavioral, and performance data',
+      'Cross-domain synergy analysis for comprehensive profiling',
+    ],
+    source: 'Complete_Evaluation_Framework.pdf',
+  },
+  resilienceDynamics: {
+    title: 'Resilience Dynamics (RD) Framework',
+    description: 'A revolutionary approach to understanding and developing adversity quotient as a dynamic system of interconnected capabilities.',
+    components: [
+      {
+        name: 'Situational Agility (SA)',
+        subComponents: ['Adaptive Problem-Solving', 'Cognitive Flexibility', 'Emotional Anchoring'],
+        weight: 1.5,
+      },
+      {
+        name: 'Proactive Momentum (PM)',
+        subComponents: ['Anticipatory Readiness', 'Initiative Amplifier', 'Momentum Maintenance'],
+        weight: 1.0,
+      },
+      {
+        name: 'Relational Resilience (RR)',
+        subComponents: ['Network Leverage', 'Boundary Navigation', 'Empathic Advocacy'],
+        weight: 1.0,
+      },
+      {
+        name: 'Regenerative Capacity (RC)',
+        subComponents: ['Energy Restoration', 'Growth Integration', 'Future-Proofing'],
+        weight: 1.5,
+      },
+    ],
+    formula: 'RD Score = (SA × 1.5) + (PM × 1.0) + (RR × 1.0) + (RC × 1.5)',
+    benchmarks: [
+      { range: '130–144', level: 'Resilience Architect', insight: 'Leverage strengths to mentor others' },
+      { range: '100–129', level: 'Dynamic Adaptor', insight: 'Focus on weaker sub-components' },
+      { range: '72–99', level: 'Emerging Resilient', insight: 'Prioritize high-weight areas (SA/RC)' },
+      { range: 'Below 72', level: 'Reactive Responder', insight: 'Develop foundational skills' },
+    ],
+    source: 'Resilience_Dynamics_RD_Framework.pdf',
+  },
   careerGuidance: {
     title: 'Career Guidance Framework',
     points: [
