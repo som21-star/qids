@@ -13,7 +13,9 @@ import {
   Briefcase,
   FileText,
   Lightbulb,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  Zap
 } from 'lucide-react';
 
 interface RightPanelProps {
@@ -131,11 +133,73 @@ export const RightPanel = ({ isOpen, highlights, quotients, modules }: RightPane
                 </CardContent>
               </Card>
 
-              {/* Career Guidance */}
+              {/* Integrated Assessment */}
+              <Card variant="sq">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-sq" />
+                    {highlights.integratedAssessment.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {highlights.integratedAssessment.points.map((point, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <CheckCircle2 className="h-3 w-3 text-sq mt-0.5 shrink-0" />
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Resilience Dynamics Framework */}
               <Card variant="aq">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-aq" />
+                    <Zap className="h-4 w-4 text-aq" />
+                    {highlights.resilienceDynamics.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    {highlights.resilienceDynamics.description}
+                  </p>
+                  <div className="space-y-2">
+                    {highlights.resilienceDynamics.components.map((comp, idx) => (
+                      <div key={idx} className="bg-muted/30 rounded-lg p-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-foreground">{comp.name}</span>
+                          <Badge variant="outline" className="text-xs">×{comp.weight}</Badge>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {comp.subComponents.map((sub, subIdx) => (
+                            <span key={subIdx} className="text-xs bg-aq/10 text-aq px-1.5 py-0.5 rounded">
+                              {sub}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-3 font-mono text-xs text-foreground">
+                    {highlights.resilienceDynamics.formula}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-muted-foreground font-medium">Benchmarks:</span>
+                    {highlights.resilienceDynamics.benchmarks.map((bench, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-xs bg-muted/20 rounded px-2 py-1">
+                        <span className="text-foreground">{bench.range}</span>
+                        <Badge variant="aq" className="text-xs">{bench.level}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Career Guidance */}
+              <Card variant="glass">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-primary" />
                     {highlights.careerGuidance.title}
                   </CardTitle>
                 </CardHeader>
