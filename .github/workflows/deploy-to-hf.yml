@@ -1,4 +1,4 @@
-name: Build & Deploy QIDS to Hugging Face Space
+name: Build & Deploy QIDS (debuggable)
 
 on:
   push:
@@ -14,51 +14,93 @@ jobs:
       HF_TOKEN: ${{ secrets.Git-HF-Deploy }}
 
     steps:
-      # 1️⃣ Checkout source code
-      - name: Checkout GitHub repo
+      - name: Checkout repo (full)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # 2️⃣ Setup Node for Vite build
-      - name: Setup Node.js
+      - name: Print environment info (no secrets)
+        run: |
+          echo "RUNNER_OS=$RUNNER_OS"
+          node --version || true
+          npm --version || true
+          echo "PWD=$(pwd)"
+          ls -la
+
+      - name: Show package.json (for debugging)
+        run: |
+          if [ -f package.json ]; then
+            echo "---- package.json -----"
+            jq -r .scripts package.json || cat package.json
+            echo "-----------------------"
+          else
+            echo "package.json NOT FOUND"
+          fi
+        shell: bash
+
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "npm"
 
-      # 3️⃣ Install dependencies
-      - name: Install dependencies
-        run: npm ci
-
-      # 4️⃣ Build Vite app
-      - name: Build frontend (Vite)
-        run: npm run build
-
-      # 5️⃣ Verify dist exists (hard fail if not)
-      - name: Verify build output
+      - name: Install NPM dependencies
         run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ dist/ directory not found. Build failed."
-            exit 1
+          npm ci
+        env:
+          CI: true
+
+      - name: Run Vite build (npm run build)
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log
+          echo "BUILD EXIT:$?"
+          tail -n +1 build.log | sed -n '1,200p'
+        continue-on-error: false
+
+      - name: Show build output dir candidates (debug)
+        run: |
+          echo "Listing common output dirs..."
+          for d in dist build out public; do
+            echo "--- $d ---"
+            ls -la $d || true
+          done
+
+      - name: Ensure dist exists (fail fast)
+        run: |
+          if [ -d "dist" ]; then
+            echo "✅ dist/ exists"
+            ls -la dist | sed -n '1,200p'
+          else
+            echo "❌ dist/ NOT FOUND. Build probably failed or outputs to different folder."
+            echo "Check package.json build script or Vite config (outDir)."
+            exit 2
           fi
-          echo "✅ dist/ directory found"
-          ls -la dist
 
-      # 6️⃣ Clone Hugging Face Space repo
-      - name: Clone HF Space
+      - name: Clone HF Space repo
         run: |
+          echo "Cloning HF Space..."
           git clone https://huggingface.co/spaces/${HF_USER}/${HF_SPACE} hf-space
+          echo "HF-space contents before sync:"
+          ls -la hf-space || true
 
-      # 7️⃣ Sync dist → HF Space root
-      - name: Sync build to HF Space
+      - name: Sync dist -> HF Space (root)
         run: |
+          echo "Syncing dist/ to hf-space/ (root)..."
           rsync -av --delete dist/ hf-space/
+          echo "--- hf-space after sync (preview) ---"
+          ls -la hf-space | sed -n '1,200p'
 
-      # 8️⃣ Commit & push to HF Space
-      - name: Push to Hugging Face Space
+      - name: Commit & push to HF Space
         run: |
           cd hf-space
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
-          git add .
-          git commit -m "Auto deploy QIDS build ($GITHUB_SHA)" || echo "No changes to commit"
+          git add --all
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto deploy QIDS build ($GITHUB_SHA)"
+          fi
+          echo "Attempting push..."
           git push https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_USER}/${HF_SPACE}.git HEAD:main
