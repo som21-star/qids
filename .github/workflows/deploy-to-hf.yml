@@ -1,34 +1,64 @@
-name: Mirror to Hugging Face Space
+name: Build & Deploy QIDS to Hugging Face Space
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install git
-        run: sudo apt-get update && sudo apt-get install -y git
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install huggingface_hub
-        run: pip install huggingface_hub
-      - name: Configure git
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GH Action - HF Mirror"
-      - name: Clone HF Space
-        env:
-          HF_TOKEN: ${{ secrets.Git-HF-Deploy }}
-        run: |
-          git clone https://huggingface.co/spaces/Cosmographer/QIDS hf-space
-          rsync -av --delete ./ hf-space/  # copy everything into space folder
-          cd hf-space
-          git add .
-          git commit -m "Mirror from GitHub: $GITHUB_SHA" || echo "No changes"
-          # push using token auth
-          git push https://Cosmographer:${Git-HF-Deploy}@huggingface.co/spaces/Cosmographer/QIDS.git HEAD:main
 
+    env:
+      HF_USER: Cosmographer
+      HF_SPACE: QIDS
+      HF_TOKEN: ${{ secrets.Git-HF-Deploy }}
+
+    steps:
+      # 1️⃣ Checkout source code
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node for Vite build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4️⃣ Build Vite app
+      - name: Build frontend (Vite)
+        run: npm run build
+
+      # 5️⃣ Verify dist exists (hard fail if not)
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ dist/ directory not found. Build failed."
+            exit 1
+          fi
+          echo "✅ dist/ directory found"
+          ls -la dist
+
+      # 6️⃣ Clone Hugging Face Space repo
+      - name: Clone HF Space
+        run: |
+          git clone https://huggingface.co/spaces/${HF_USER}/${HF_SPACE} hf-space
+
+      # 7️⃣ Sync dist → HF Space root
+      - name: Sync build to HF Space
+        run: |
+          rsync -av --delete dist/ hf-space/
+
+      # 8️⃣ Commit & push to HF Space
+      - name: Push to Hugging Face Space
+        run: |
+          cd hf-space
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "Auto deploy QIDS build ($GITHUB_SHA)" || echo "No changes to commit"
+          git push https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_USER}/${HF_SPACE}.git HEAD:main
