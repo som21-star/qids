@@ -1,0 +1,2 @@
+- name: Huggingface Login
+  uses: osbm/huggingface-login@v0.0.2
