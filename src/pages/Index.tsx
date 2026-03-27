@@ -37,7 +37,7 @@ const Index = () => {
     : processNodes.filter(node => node.phase === phaseFilter);
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
       <Header 
         phaseFilter={phaseFilter}
         setPhaseFilter={setPhaseFilter}
@@ -50,7 +50,7 @@ const Index = () => {
         isMobile={isMobile}
       />
       
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Desktop: side panels. Mobile: full-screen views */}
         {isMobile ? (
           <>
