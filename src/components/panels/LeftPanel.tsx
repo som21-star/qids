@@ -27,7 +27,7 @@ const phaseLabels = {
   corporate: 'Corporate',
 };
 
-export const LeftPanel = ({ isOpen, selectedNode, nodes, onNodeClick }: LeftPanelProps) => {
+export const LeftPanel = ({ isOpen, selectedNode, nodes, onNodeClick, isMobile = false }: LeftPanelProps) => {
   if (!isOpen) return null;
 
   const groupedNodes = nodes.reduce((acc, node) => {
