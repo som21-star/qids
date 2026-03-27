@@ -37,7 +37,10 @@ export const LeftPanel = ({ isOpen, selectedNode, nodes, onNodeClick, isMobile =
   }, {} as Record<string, ProcessNode[]>);
 
   return (
-    <aside className="w-80 border-r border-border bg-sidebar flex flex-col shrink-0 animate-slide-in-right">
+    <aside className={cn(
+      "border-r border-border bg-sidebar flex flex-col shrink-0 animate-slide-in-right",
+      isMobile ? "w-full" : "w-80"
+    )}>
       {/* Selected Node Details */}
       {selectedNode && (
         <div className="p-4 border-b border-border">
