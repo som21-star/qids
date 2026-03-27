@@ -10,6 +10,7 @@ interface LeftPanelProps {
   selectedNode: ProcessNode | null;
   nodes: ProcessNode[];
   onNodeClick: (node: ProcessNode) => void;
+  isMobile?: boolean;
 }
 
 const phaseColors = {
