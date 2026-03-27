@@ -1,4 +1,5 @@
 import { Quotient, Module, technicalHighlights } from '@/data/frameworkData';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -23,6 +24,7 @@ interface RightPanelProps {
   highlights: typeof technicalHighlights;
   quotients: Quotient[];
   modules: Module[];
+  isMobile?: boolean;
 }
 
 const quotientIcons = {
@@ -32,11 +34,14 @@ const quotientIcons = {
   AQ: Shield,
 };
 
-export const RightPanel = ({ isOpen, highlights, quotients, modules }: RightPanelProps) => {
+export const RightPanel = ({ isOpen, highlights, quotients, modules, isMobile = false }: RightPanelProps) => {
   if (!isOpen) return null;
 
   return (
-    <aside className="w-96 border-l border-border bg-sidebar flex flex-col shrink-0 animate-slide-in-right">
+    <aside className={cn(
+      "border-l border-border bg-sidebar flex flex-col shrink-0 animate-slide-in-right",
+      isMobile ? "w-full border-l-0" : "w-96"
+    )}>
       <ScrollArea className="flex-1">
         <div className="p-4">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
