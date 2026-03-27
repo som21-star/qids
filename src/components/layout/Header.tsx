@@ -13,7 +13,6 @@ import {
   FileJson,
   FileImage,
   Presentation,
-  Filter
 } from 'lucide-react';
 import {
   DropdownMenu,
