@@ -23,6 +23,7 @@ interface RightPanelProps {
   highlights: typeof technicalHighlights;
   quotients: Quotient[];
   modules: Module[];
+  isMobile?: boolean;
 }
 
 const quotientIcons = {
